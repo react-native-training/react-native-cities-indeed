@@ -6,7 +6,8 @@ import {
   Modal,
   TextInput,
   TouchableHighlight,
-  TouchableOpacity
+  TouchableOpacity,
+  ScrollView
 } from 'react-native'
 
 import { Icon } from 'react-native-elements'
@@ -53,11 +54,68 @@ class City extends React.Component {
     }
     const city = this.props.navigation.state.params
     this.props.dispatchAddLocation(city, location)
+    this.setState({ input: { name: '', info: '' }})
+    this.toggleModal()
   }
   render() {
     return (
-      <View style={styles.container}>
-        <Text>Hello from City</Text>
+      <View style={{flex:1}}>
+        <ScrollView
+        >
+          
+          {
+            this.props.city.locations.map((location, index) => (
+              <View
+                key={index}
+                style={styles.card}
+              >
+                <Text>{location.name}</Text>
+                <Text>{location.info}</Text>
+              </View>
+            ))
+          }
+          <Modal
+            visible={this.state.modalVisible}
+            animationType='slide'
+          >
+            <View style={styles.modal}>
+              <TextInput
+                placeholder='Location Name'
+                onChangeText={(value) => this.onChangeText('name', value)}
+                style={styles.input}
+                value={this.state.input.name}
+              />
+              <TextInput
+                placeholder='Location Information'
+                onChangeText={(value) => this.onChangeText('info', value)}
+                style={styles.input}
+                value={this.state.input.info}
+              />
+              <TouchableHighlight
+                onPress={this.submitForm}
+                style={{marginHorizontal: 10}}
+                underlayColor='transparent'
+              >
+                <View
+                  style={styles.button}
+                >
+                  <Text
+                    style={{color: 'white'}}
+                  >Submit Form</Text>
+                </View>
+              </TouchableHighlight>
+              <Icon
+                raised
+                icon
+                color='white'
+                onPress={this.toggleModal}
+                underlayColor={colors.primary}
+                containerStyle={styles.icon}
+                name='close'
+              />
+            </View>
+          </Modal>
+        </ScrollView>
         <Icon
           raised
           icon
@@ -67,53 +125,17 @@ class City extends React.Component {
           containerStyle={styles.icon}
           name='add'
         />
-        <Modal
-          visible={this.state.modalVisible}
-          animationType='slide'
-        >
-          <View style={styles.modal}>
-            <TextInput
-              placeholder='Location Name'
-              onChangeText={(value) => this.onChangeText('name', value)}
-              style={styles.input}
-              value={this.state.input.name}
-            />
-            <TextInput
-              placeholder='Location Information'
-              onChangeText={(value) => this.onChangeText('info', value)}
-              style={styles.input}
-              value={this.state.input.info}
-            />
-            <TouchableHighlight
-              onPress={this.submitForm}
-              style={{marginHorizontal: 10}}
-              underlayColor='transparent'
-            >
-              <View
-                style={styles.button}
-              >
-                <Text
-                  style={{color: 'white'}}
-                >Submit Form</Text>
-              </View>
-            </TouchableHighlight>
-            <Icon
-              raised
-              icon
-              color='white'
-              onPress={this.toggleModal}
-              underlayColor={colors.primary}
-              containerStyle={styles.icon}
-              name='close'
-            />
-          </View>
-        </Modal>
       </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  card: {
+    margin: 15,
+    backgroundColor: 'white',
+    padding: 15,
+  },
   button: {
     height: 50,
     backgroundColor: colors.primary,
@@ -143,10 +165,16 @@ const styles = StyleSheet.create({
   }
 })
 
-const mapDispatchToProps = (dispatch) => {
+const mapStateToProps = (state, nextProps) => {
+  const id = nextProps.navigation.state.params.id
+  const city = state.citiesReducer.cities.find(city => city.id === id)
   return {
-    dispatchAddLocation: (city, location) => dispatch(addLocation(city, location))
+    city: city
   }
 }
 
-export default connect(null, mapDispatchToProps)(City)
+const mapDispatchToProps = {
+  dispatchAddLocation: (city, location) => addLocation(city, location)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(City)
