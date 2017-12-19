@@ -1,14 +1,12 @@
 import React from 'react'
 import {
-  View, Text, StyleSheet, Image, FlatList
+  View, Text, StyleSheet, Image, FlatList, ActivityIndicator
 } from 'react-native'
-
 import { ListItem } from 'react-native-elements'
 
 import { connect } from 'react-redux'
-
 import PropTypes from 'prop-types'
-
+import { getCitiesFromAPI } from '../../actions/citiesActions'
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -30,6 +28,9 @@ class Cities extends React.Component {
       />
     )
   }
+  componentDidMount() {
+    this.props.dispatchGetCitiesFromAPI()
+  }
   renderCity = ({ item }) => {
     return (
       <ListItem
@@ -41,11 +42,19 @@ class Cities extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <FlatList
-          keyExtractor={(city) => city.id}
-          data={this.props.cities}
-          renderItem={this.renderCity}
-        />
+        {
+          this.props.citiesInfo.isFetching ? (
+            <ActivityIndicator
+              animating
+            />
+          ) : (
+            <FlatList
+              keyExtractor={(city) => city.id}
+              data={this.props.cities}
+              renderItem={this.renderCity}
+            />
+          )
+        }
       </View>
     )
   }
@@ -53,8 +62,13 @@ class Cities extends React.Component {
 
 const mapStateToProps = (state, nextProps) => {
   return {
-    cities: state.citiesReducer.cities
+    cities: state.citiesReducer.cities,
+    citiesInfo: state.citiesReducer
   }
 }
 
-export default connect(mapStateToProps)(Cities)
+const mapDispatchToProps = {
+  dispatchGetCitiesFromAPI: getCitiesFromAPI
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cities)

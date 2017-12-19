@@ -1,3 +1,5 @@
+import uuidV4 from 'uuid/v4'
+
 const cities = [
   { name: 'Detroit', locations: [], country: 'USA', id: uuidV4() },
   { name: 'Montreal', locations: [], country: 'Canada', id: uuidV4() },

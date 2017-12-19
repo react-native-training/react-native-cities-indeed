@@ -1,12 +1,32 @@
-import { ADD_CITY, ADD_LOCATION } from '../actions/citiesActions'
+import { ADD_CITY, ADD_LOCATION, FETCHING_CITIES, FETCHING_CITIES_SUCCESS, FETCHING_CITIES_FAILURE } from '../actions/citiesActions'
+
 import uuidV4 from 'uuid/v4'
 
 const initialState = {
-  cities: []
+  cities: [],
+  error: false,
+  isFetching: false
 }
 
 export default function citiesReducer(state = initialState, action) {
   switch(action.type) {
+    case FETCHING_CITIES:
+      return {
+        ...state,
+        isFetching: true
+      }
+    case FETCHING_CITIES_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        cities: action.cities
+      }
+    case FETCHING_CITIES_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+        error: true
+      }
     case ADD_LOCATION:
       const city = state.cities.filter(city => {
         return city.id === action.city.id
