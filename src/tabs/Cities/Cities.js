@@ -51,7 +51,7 @@ class Cities extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, nextProps) => {
   return {
     cities: state.citiesReducer.cities
   }
